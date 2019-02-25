@@ -17,8 +17,7 @@ if yes?("Enable Azure?")
   gem 'azure'
   gem 'azure-storage'
 end
-#gem 'bootstrap-will_paginate'
-gem 'will_paginate-bootstrap'
+gem 'will_paginate-bootstrap4'
 gem 'counter_culture'
 gem 'devise'
 gem 'devise-bootstrap-views'
@@ -118,10 +117,13 @@ application  do
   }
 end
 
+run "bundle"
+
+run "yarn add feather-icons"
 run "yarn add jquery"
 run "yarn add bootstrap@4"
 
-gsub_file 'app/assets/javascripts/application.js', /\/\/= require_tree \./, "//= require jquery/dist/jquery.js\n//= require_tree ."
+gsub_file 'app/assets/javascripts/application.js', /\/\/= require_tree \./, "//= require jquery/dist/jquery.js\n//= require feather-icons/dist/feather.js\n//= require_tree ."
 gsub_file 'app/assets/stylesheets/application.css', /\*= require_tree \./, "*= require bootstrap/dist/css/bootstrap.min\n *= require_tree ."
 
 #--- Scaffold
@@ -139,10 +141,19 @@ file 'lib/templates/erb/scaffold/new.html.erb.tt', File.open(__dir__ + "/lib/tem
 #--- Scaffold
 file 'lib/templates/erb/scaffold/show.html.erb.tt', File.open(__dir__ + "/lib/templates/erb/scaffold/show.html.erb.tt").read
 
+#--- Scaffold
 file 'lib/templates/rails/scaffold_controller/controller.rb.tt', File.open(__dir__ + "/lib/templates/rails/scaffold_controller/controller.rb.tt").read
 
+#--- Scaffold
+file 'app/controllers/application_controller.rb', File.open(__dir__ + "/app/controllers/application_controller.rb").read
+
 remove_file 'app/views/layouts/application.html.erb'
-file 'app/views/layouts/application.html.erb', File.open(__dir__ + "/app/views/layouts/application.html.erb").read
+if yes?('Dashboard Layout?')
+  file 'app/views/layouts/application.html.erb', File.open(__dir__ + "/app/views/layouts/application_dashboard.html.erb").read
+  file 'app/assets/stylesheets/dashboard.css', File.open(__dir__ + "/app/assets/stylesheets/dashboard.css").read
+else
+  file 'app/views/layouts/application.html.erb', File.open(__dir__ + "/app/views/layouts/application.html.erb").read
+end
 
 if yes?('Generate Demo?')
   generate(:scaffold, "person", "name:string", "address:text", "age:integer")

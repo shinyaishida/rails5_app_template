@@ -8,9 +8,9 @@
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
     <style>
-    body {
-      padding-top: 5rem;
-    }
+body {
+  padding-top: 5rem;
+}
     </style>
   </head>
   <body>
@@ -50,7 +50,12 @@
 
     <!-- Main -->
     <main role="main" class="container">
-    <%= yield %>
+      <% flash.each do |name, msg| %>
+      <div class="alert alert-<%= name %>">
+        <%= msg.html_safe %>
+      </div>
+      <% end %>
+      <%= yield %>
     </main>
   </body>
 </html>

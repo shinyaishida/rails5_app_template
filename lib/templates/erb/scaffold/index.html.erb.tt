@@ -22,16 +22,16 @@
 <% attributes.reject(&:password_digest?).each do |attribute| -%>
         <td><%%= <%= singular_table_name %>.<%= attribute.name %> %></td>
 <% end -%>
-        <td><%%= link_to 'Show', <%= model_resource_name %> %></td>
-        <td><%%= link_to 'Edit', edit_<%= singular_route_name %>_path(<%= singular_table_name %>) %></td>
-        <td><%%= link_to 'Destroy', <%= model_resource_name %>, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%%= link_to 'Show', <%= model_resource_name %>, class: 'btn btn-sm btn-secondary' %></td>
+        <td><%%= link_to 'Edit', edit_<%= singular_route_name %>_path(<%= singular_table_name %>), class: 'btn btn-sm btn-primary' %></td>
+        <td><%%= link_to 'Destroy', <%= model_resource_name %>, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-sm btn-danger' %></td>
       </tr>
     <%% end %>
   </tbody>
 </table>
 
 <% if defined?(WillPaginate) -%>
-<%%= will_paginate @<%= plural_table_name %>, renderer: BootstrapPagination::Rails, previous_label: '&#8592; &nbsp;前', next_label: '次 &#8594;' %>
+<%%= will_paginate @<%= plural_table_name %>, renderer: WillPaginate::ActionView::BootstrapLinkRenderer, previous_label: '&#8592; &nbsp;前', next_label: '次 &#8594;' %>
 <% end %>
 
 <br>

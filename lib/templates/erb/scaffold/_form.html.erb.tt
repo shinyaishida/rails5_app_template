@@ -28,7 +28,7 @@
   </div>
 
 <% end -%>
-  <div class="actions">
-    <%%= form.submit class: "btn btn-primary" %>
+  <div class="actions mb-4">
+    <%%= form.submit class: "btn btn-sm btn-primary" %>
   </div>
 <%% end %>
