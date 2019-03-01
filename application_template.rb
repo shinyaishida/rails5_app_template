@@ -1,40 +1,51 @@
+#== Ask options
+run_options = []
+run_options << 'tagging' if yes?("Enable Tagging?")
+run_options << 'multi_tenant' if yes?("Enable Multi Tenant?")
+run_options << 'aws' if yes?("Enable AWS?")
+run_options << 'azure' if yes?("Enable Azure?")
+run_options << 'sqlserver' if yes?("Enable SQLServer?")
+run_options << 'mysql' if yes?("Enable mysql?")
+run_options << 'omniauth' if yes?("Enable omniauith?")
+run_options << 'dashboard_layout' if yes?('Dashboard Layout?')
+run_options << 'devise_authenticate' if yes?("Devise Authentication?")
+run_options << 'generate_demo' if yes?('Generate Demo?')
+
 #== See https://qiita.com/Kta-M/items/254a1ba141827a989cb7
 gsub_file 'Gemfile', /^gem 'sqlite3'$/, "gem 'sqlite3', '~> 1.3.6'"
 
 #== Popular gems
-if yes?("Enable Tagging?")
-  gem 'acts-as-taggable-on'
-end
+gem 'acts-as-taggable-on' if run_options.include?('tagging')
+
 gem 'activerecord-session_store'
-if yes?("Enable Multi Tenant?")
-  gem 'apartment'
-end
-if yes?("Enable AWS?")
-  gem 'aws-sdk', '~> 3'
-  gem 'aws-sdk-s3'
-end
-if yes?("Enable Azure?")
-  gem 'azure'
-  gem 'azure-storage'
-end
+
+gem 'apartment' if run_options.include?('multi_tenant')
+
+gem 'aws-sdk', '~> 3' if run_options.include?('aws')
+gem 'aws-sdk-s3' if run_options.include?('aws')
+
+gem 'azure' if run_options.include?('azure')
+gem 'azure-storage' if run_options.include?('azure')
+
 gem 'will_paginate-bootstrap4'
 gem 'counter_culture'
 gem 'devise'
 gem 'devise-bootstrap-views'
 gem 'devise-i18n'
 gem 'devise-i18n-views'
-if yes?("Enable SQLServer?")
-  gem 'activerecord-sqlserver-adapter', git: 'https://github.com/matthewdunbar/activerecord-sqlserver-adapter.git'
-end
+
+gem 'activerecord-sqlserver-adapter', git: 'https://github.com/matthewdunbar/activerecord-sqlserver-adapter.git' if run_options.include?('sqlserver')
+
 gem 'meta-tags'
-if yes?("Enable mysql?")
-  gem 'mysql2', '~> 0.5'
-end
-if yes?("Enable omniauith?")
+
+gem 'mysql2', '~> 0.5' if run_options.include?('mysql')
+
+if run_options.include?('omniauth')
   gem 'omniauth'
   gem 'omniauth-facebook'
   gem 'omniauth-twitter'
 end
+
 gem 'ransack'
 gem 'sitemap_generator'
 gem 'unicorn'
@@ -148,14 +159,37 @@ file 'lib/templates/rails/scaffold_controller/controller.rb.tt', File.open(__dir
 file 'app/controllers/application_controller.rb', File.open(__dir__ + "/app/controllers/application_controller.rb").read
 
 remove_file 'app/views/layouts/application.html.erb'
-if yes?('Dashboard Layout?')
+if run_options.include?('dashboard_layout')
   file 'app/views/layouts/application.html.erb', File.open(__dir__ + "/app/views/layouts/application_dashboard.html.erb").read
   file 'app/assets/stylesheets/dashboard.css', File.open(__dir__ + "/app/assets/stylesheets/dashboard.css").read
 else
   file 'app/views/layouts/application.html.erb', File.open(__dir__ + "/app/views/layouts/application.html.erb").read
 end
 
-if yes?('Generate Demo?')
+if run_options.include?('devise_authenticate')
+  # See https://github.com/rails/rails/pull/34980
+  #     https://github.com/plataformatec/devise/issues/4992
+  generate('devise:install')
+  generate('devise', 'User')
+  rails_command "db:migrate"
+  generate('devise:views:bootstrap_templates')
+  append_to_file 'db/seeds.rb',%(
+  if User.count.zero?
+    user = User.new(
+      email: 'admin@example.com',
+      password: 'passw0rd',
+      password_confirmation: 'passw0rd'
+    )
+    user.save(validate: false)
+  end
+)
+  rails_command "db:seed"
+end
+
+if run_options.include?('generate_demo')
   generate(:scaffold, "person", "name:string", "address:text", "age:integer")
   rails_command "db:migrate"
+  if run_options.include?('devise_authenticate')
+    gsub_file 'app/controllers/people_controller.rb', /ApplicationController$/, "ApplicationController\n  before_action :authenticate_user!"
+  end
 end
