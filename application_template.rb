@@ -10,6 +10,7 @@ run_options << 'omniauth' if yes?("Enable omniauith?")
 run_options << 'dashboard_layout' if yes?('Dashboard Layout?')
 run_options << 'devise_authenticate' if yes?("Devise Authentication?")
 run_options << 'generate_demo' if yes?('Generate Demo?')
+run_options << 'generate_secrets' if yes?('Generate secret.yml?')
 
 #== See https://qiita.com/Kta-M/items/254a1ba141827a989cb7
 gsub_file 'Gemfile', /^gem 'sqlite3'$/, "gem 'sqlite3', '~> 1.3.6'"
@@ -157,6 +158,22 @@ file 'lib/templates/rails/scaffold_controller/controller.rb.tt', File.open(__dir
 
 #--- Scaffold
 file 'app/controllers/application_controller.rb', File.open(__dir__ + "/app/controllers/application_controller.rb").read
+
+#-- config/secrets.yml
+if run_options.include?('generate_secrets')
+  require 'securerandom'
+  body = File.open(__dir__ + "/config/secrets.yml").read
+  body.gsub!(/REPLACE_HERE/, SecureRandom.alphanumeric(64))
+  file 'config/secrets.yml', body
+  run 'rm config/master.key'
+  run 'rm config/credentials.yml.enc'
+  inject_into_file 'config/application.rb', after: "config.i18n.default_locale = :ja\n" do <<-'RUBY'
+    config.require_master_key = false
+    config.x.secrets = ActiveSupport::InheritableOptions.new(config_for(:secrets))
+    config.secret_token = config.x.secrets.secret_key_base
+RUBY
+  end
+end
 
 remove_file 'app/views/layouts/application.html.erb'
 if run_options.include?('dashboard_layout')
