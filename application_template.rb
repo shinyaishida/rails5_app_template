@@ -53,6 +53,7 @@ gem 'unicorn'
 gem 'will_paginate'
 
 gem_group :development, :test do
+  gem 'active-record-query-trace'
   gem 'byebug'
   gem 'debase'
   gem 'factory_bot'
@@ -135,6 +136,7 @@ run "yarn add feather-icons"
 run "yarn add jquery"
 run "yarn add bootstrap@4"
 
+#-- application.js / application.css
 gsub_file 'app/assets/javascripts/application.js', /\/\/= require_tree \./, "//= require jquery/dist/jquery.js\n//= require feather-icons/dist/feather.js\n//= require_tree ."
 gsub_file 'app/assets/stylesheets/application.css', /\*= require_tree \./, "*= require bootstrap/dist/css/bootstrap.min\n *= require_tree ."
 
@@ -210,3 +212,6 @@ if run_options.include?('generate_demo')
     gsub_file 'app/controllers/people_controller.rb', /ApplicationController$/, "ApplicationController\n  before_action :authenticate_user!"
   end
 end
+
+#--- Enable ActiveRecord Query Trace
+file 'config/initializers/active_record_query_trace.rb', File.open(__dir__ + "/config/initializers/active_record_query_trace.rb").read
