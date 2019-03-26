@@ -7,6 +7,7 @@ run_options << 'azure' if yes?("Enable Azure?")
 run_options << 'sqlserver' if yes?("Enable SQLServer?")
 run_options << 'mysql' if yes?("Enable mysql?")
 run_options << 'omniauth' if yes?("Enable omniauith?")
+run_options << 'admin-lte' if yes?('AdminLTE?')
 run_options << 'dashboard_layout' if yes?('Dashboard Layout?')
 run_options << 'devise_authenticate' if yes?("Devise Authentication?")
 run_options << 'generate_demo' if yes?('Generate Demo?')
@@ -136,9 +137,18 @@ run "yarn add feather-icons"
 run "yarn add jquery"
 run "yarn add bootstrap@4"
 
+if run_options.include?('admin-lte')
+  run "yarn add admin-lte@3.0.0-alpha.2"
+end
+
 #-- application.js / application.css
-gsub_file 'app/assets/javascripts/application.js', /\/\/= require_tree \./, "//= require jquery/dist/jquery.js\n//= require feather-icons/dist/feather.js\n//= require_tree ."
-gsub_file 'app/assets/stylesheets/application.css', /\*= require_tree \./, "*= require bootstrap/dist/css/bootstrap.min\n *= require_tree ."
+if run_options.include?('admin-lte')
+  gsub_file 'app/assets/javascripts/application.js', /\/\/= require_tree \./, "//= require jquery/dist/jquery.js\n//= require feather-icons/dist/feather.js\n//= require bootstrap/dist/js/bootstrap.min\n//= require admin-lte/dist/js/adminlte.min\n//= require_tree ."
+  gsub_file 'app/assets/stylesheets/application.css', /\*= require_tree \./, "*= require bootstrap/dist/css/bootstrap.min\n*= require admin-lte/dist/css/adminlte.min\n*= require admin-lte/plugins/iCheck/all\n*= require font-awesome/css/font-awesome.min\n*= require_tree ."
+else
+  gsub_file 'app/assets/javascripts/application.js', /\/\/= require_tree \./, "//= require jquery/dist/jquery.js\n//= require bootstrap/dist/js/bootstrap.min\n//= require feather-icons/dist/feather.js\n//= require_tree ."
+  gsub_file 'app/assets/stylesheets/application.css', /\*= require_tree \./, "*= require bootstrap/dist/css/bootstrap.min\n *= require_tree ."
+end
 
 #--- Scaffold
 file 'lib/templates/erb/scaffold/_form.html.erb.tt', File.open(__dir__ + "/lib/templates/erb/scaffold/_form.html.erb.tt").read
@@ -178,7 +188,10 @@ RUBY
 end
 
 remove_file 'app/views/layouts/application.html.erb'
-if run_options.include?('dashboard_layout')
+if run_options.include?('admin-lte')
+  file 'app/views/layouts/application.html.erb', File.open(__dir__ + "/app/views/layouts/application_adminlte.html.erb").read
+  file 'app/assets/images/AdminLTELogo.png', File.open(__dir__ + "/app/assets/images/AdminLTELogo.png").read
+elsif run_options.include?('dashboard_layout')
   file 'app/views/layouts/application.html.erb', File.open(__dir__ + "/app/views/layouts/application_dashboard.html.erb").read
   file 'app/assets/stylesheets/dashboard.css', File.open(__dir__ + "/app/assets/stylesheets/dashboard.css").read
 else
