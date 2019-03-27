@@ -9,6 +9,9 @@
 
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
+    <style type="text/css">
+    .main_box {position:relative;background:#fff;border:1px solid rgba(0,0,0,.125)}
+    </style>
   </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -104,12 +107,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">Starter Page</h1>
+            <h1 class="m-0 text-dark"><%= content_for?(:title) ? yield(:title) : "Starter Page" %></h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Starter Page</li>
+              <li class="breadcrumb-item active"><%= content_for?(:title) ? yield(:title) : "Starter Page" %></li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -130,6 +133,7 @@
             </div>
             <% end %>
             <%= yield %>
+            <div class="pb-3"></div>
           </div>
         </div>
       </div><!-- /.container-fluid -->

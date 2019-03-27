@@ -150,20 +150,22 @@ else
   gsub_file 'app/assets/stylesheets/application.css', /\*= require_tree \./, "*= require bootstrap/dist/css/bootstrap.min\n *= require_tree ."
 end
 
-#--- Scaffold
-file 'lib/templates/erb/scaffold/_form.html.erb.tt', File.open(__dir__ + "/lib/templates/erb/scaffold/_form.html.erb.tt").read
+dir = run_options.include?('admin-lte') ? 'erb_adminlte' : 'erb'
 
 #--- Scaffold
-file 'lib/templates/erb/scaffold/edit.html.erb.tt', File.open(__dir__ + "/lib/templates/erb/scaffold/edit.html.erb.tt").read
+file 'lib/templates/erb/scaffold/_form.html.erb.tt', File.open(__dir__ + "/lib/templates/#{dir}/scaffold/_form.html.erb.tt").read
 
 #--- Scaffold
-file 'lib/templates/erb/scaffold/index.html.erb.tt', File.open(__dir__ + "/lib/templates/erb/scaffold/index.html.erb.tt").read
+file 'lib/templates/erb/scaffold/edit.html.erb.tt', File.open(__dir__ + "/lib/templates/#{dir}/scaffold/edit.html.erb.tt").read
 
 #--- Scaffold
-file 'lib/templates/erb/scaffold/new.html.erb.tt', File.open(__dir__ + "/lib/templates/erb/scaffold/new.html.erb.tt").read
+file 'lib/templates/erb/scaffold/index.html.erb.tt', File.open(__dir__ + "/lib/templates/#{dir}/scaffold/index.html.erb.tt").read
 
 #--- Scaffold
-file 'lib/templates/erb/scaffold/show.html.erb.tt', File.open(__dir__ + "/lib/templates/erb/scaffold/show.html.erb.tt").read
+file 'lib/templates/erb/scaffold/new.html.erb.tt', File.open(__dir__ + "/lib/templates/#{dir}/scaffold/new.html.erb.tt").read
+
+#--- Scaffold
+file 'lib/templates/erb/scaffold/show.html.erb.tt', File.open(__dir__ + "/lib/templates/#{dir}/scaffold/show.html.erb.tt").read
 
 #--- Scaffold
 file 'lib/templates/rails/scaffold_controller/controller.rb.tt', File.open(__dir__ + "/lib/templates/rails/scaffold_controller/controller.rb.tt").read
