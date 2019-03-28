@@ -35,6 +35,7 @@ gem 'devise'
 gem 'devise-bootstrap-views'
 gem 'devise-i18n'
 gem 'devise-i18n-views'
+gem 'rails-i18n', '~> 5'
 
 gem 'activerecord-sqlserver-adapter', git: 'https://github.com/matthewdunbar/activerecord-sqlserver-adapter.git' if run_options.include?('sqlserver')
 
@@ -226,6 +227,7 @@ if run_options.include?('generate_demo')
   if run_options.include?('devise_authenticate')
     gsub_file 'app/controllers/people_controller.rb', /ApplicationController$/, "ApplicationController\n  before_action :authenticate_user!"
   end
+  gsub_file 'app/models/person.rb', /ApplicationRecord$/, "ApplicationRecord\n  validates :name, presence: true\n  validates :address, presence: true\n  validates :age, presence: true"
 end
 
 #--- Enable ActiveRecord Query Trace
